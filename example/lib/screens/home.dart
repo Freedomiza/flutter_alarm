@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:alarm/alarm.dart';
 import 'package:alarm_example/screens/edit_alarm.dart';
 import 'package:alarm_example/screens/ring.dart';
 import 'package:alarm_example/screens/shortcut_button.dart';
 import 'package:alarm_example/widgets/tile.dart';
+import 'package:auto_start_flutter/auto_start_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class ExampleAlarmHomeScreen extends StatefulWidget {
@@ -131,9 +134,20 @@ class _ExampleAlarmHomeScreenState extends State<ExampleAlarmHomeScreen> {
                 },
               )
             : Center(
-                child: Text(
-                  'No alarms set',
-                  style: Theme.of(context).textTheme.titleMedium,
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 60,
+                    ),
+                    Text(
+                      'No alarms set',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    TextButton(
+                      onPressed: initAutoStart,
+                      child: const Text('Init auto start permission'),
+                    ),
+                  ],
                 ),
               ),
       ),
@@ -152,5 +166,24 @@ class _ExampleAlarmHomeScreenState extends State<ExampleAlarmHomeScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  Future<void> initAutoStart() async {
+    try {
+      //check auto-start availability.
+      final test = await isAutoStartAvailable;
+      print(test);
+      //if available then navigate to auto-start setting page.
+      if (test != null && test == true) await getAutoStartPermission();
+
+      debugger();
+    } on PlatformException catch (e) {
+      debugger();
+      print(e);
+    } on Exception catch (e) {
+      debugger();
+      print(e);
+    }
+    if (!mounted) return;
   }
 }
